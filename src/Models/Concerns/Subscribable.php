@@ -50,13 +50,14 @@ trait Subscribable
     /**
      * Check if the user has a given subscription.
      *
-     * @param  string $subscription Subscription name
-     * @param  string|null $planCode
+     * @param string      $name
+     * @param string|null $planCode
+     *
      * @return bool
      */
-    public function subscribed(string $subscription, string $planCode = null): bool
+    public function subscribed(string $name = 'default', string $planCode = null): bool
     {
-        $planSubscription = $this->subscription($subscription);
+        $planSubscription = $this->subscription($name);
 
         if (is_null($planSubscription)) {
             return false;
@@ -72,23 +73,24 @@ trait Subscribable
     /**
      * Subscribe user to a new plan.
      *
-     * @param string $subscription Subscription name
-     * @param \Laravel\PricingPlans\Models\Plan $plan
-     * @return \Laravel\PricingPlans\SubscriptionBuilder
+     * @param Plan   $plan
+     * @param string $name
+     *
+     * @return SubscriptionBuilder
      */
-    public function newSubscription(string $subscription, Plan $plan)
+    public function newSubscription(Plan $plan, string $name = 'default'): SubscriptionBuilder
     {
-        return new SubscriptionBuilder($this, $subscription, $plan);
+        return new SubscriptionBuilder($this, $name, $plan);
     }
 
     /**
      * Get subscription usage manager instance.
      *
-     * @param  string $subscription Subscription name
-     * @return \Laravel\PricingPlans\SubscriptionUsageManager
+     * @param  string $name Subscription name
+     * @return SubscriptionUsageManager
      */
-    public function subscriptionUsage(string $subscription)
+    public function subscriptionUsage(string $name = 'default'): SubscriptionUsageManager
     {
-        return new SubscriptionUsageManager($this->subscription($subscription));
+        return new SubscriptionUsageManager($this->subscription($name));
     }
 }
