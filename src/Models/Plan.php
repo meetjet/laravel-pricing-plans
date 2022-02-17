@@ -40,6 +40,7 @@ class Plan extends Model
         'interval_unit',
         'interval_count',
         'trial_period_days',
+        'is_one_time',
         'sort_order',
     ];
 
