@@ -62,8 +62,8 @@ trait Subscribable
             return false;
         }
 
-        if (is_null($planCode) || $planCode == $planSubscription->plan->code) {
-            return $subscription->isActive();
+        if (is_null($planCode) || $planCode === $planSubscription->plan->code) {
+            return $planSubscription->isActive();
         }
 
         return false;

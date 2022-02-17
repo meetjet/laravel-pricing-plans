@@ -1,7 +1,7 @@
 {
-  "name": "andychukse/laravel-pricing-plans",
+  "name": "meetjet/laravel-pricing-plans",
   "type": "library",
-  "description": "A package provide pricing plans for Laravel. Forked from oanhnn/laravel-pricing-plans",
+  "description": "A package provide pricing plans for Laravel. Forked from andychukse/laravel-pricing-plans",
   "keywords": [
     "plans",
     "laravel",
@@ -9,10 +9,10 @@
     "pricing"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/andychukse/laravel-pricing-plans",
+  "homepage": "https://github.com/meetjet/laravel-pricing-plans",
   "support": {
-    "issues": "https://github.com/andychukse/laravel-pricing-plans/issues",
-    "source": "https://github.com/andychukse/laravel-pricing-plans"
+    "issues": "https://github.com/meetjet/laravel-pricing-plans/issues",
+    "source": "https://github.com/meetjet/laravel-pricing-plans"
   },
   "authors": [
     {
@@ -26,7 +26,7 @@
     }
   },
   "require": {
-    "php": "^7.3|^8.0",
+    "php": "^8.0",
     "illuminate/database": "^8.0",
     "illuminate/support": "^8.0",
     "nesbot/carbon": "^2.43"
