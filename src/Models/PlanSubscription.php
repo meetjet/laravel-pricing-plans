@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
+use Laravel\PricingPlans\Events\SubscriptionCanceled;
+use Laravel\PricingPlans\Events\SubscriptionPlanChanged;
 use Laravel\PricingPlans\Events\SubscriptionRenewed;
 use Laravel\PricingPlans\Period;
 use Laravel\PricingPlans\SubscriptionAbility;
@@ -270,24 +272,27 @@ class PlanSubscription extends Model
             throw new InvalidArgumentException('Invalid plan instance');
         }
 
-        // If plans doesn't have the same billing frequency (e.g., interval
-        // and interval_count) we will update the billing dates starting
-        // today... and since we are basically creating a new billing cycle,
-        // the usage data will be cleared.
-        if (is_null($this->plan) ||
-            $this->plan->interval_unit !== $plan->interval_unit ||
-            $this->plan->interval_count !== $plan->interval_count
-        ) {
-            // Set period
-            $this->setNewPeriod($plan->interval_unit, $plan->interval_count);
+        DB::transaction(function () use ($plan){
+            // If plans doesn't have the same billing frequency (e.g., interval
+            // and interval_count) we will update the billing dates starting
+            // today... and since we are basically creating a new billing cycle,
+            // the usage data will be cleared.
+            if (is_null($this->plan) ||
+                $this->plan->interval_unit !== $plan->interval_unit ||
+                $this->plan->interval_count !== $plan->interval_count
+            ) {
+                // Set period
+                $this->setNewPeriod($plan->interval_unit, $plan->interval_count);
 
-            // Clear usage data
-            $usageManager = new SubscriptionUsageManager($this);
-            $usageManager->clear();
-        }
+                // Clear usage data
+                $usageManager = new SubscriptionUsageManager($this);
+                $usageManager->clear();
+            }
 
-        // Attach new plan to subscription
-        $this->plan_id = $plan->id;
+            // Attach new plan to subscription
+            $this->plan_id = $plan->id;
+            $this->save();
+        });
 
         return $this;
     }
