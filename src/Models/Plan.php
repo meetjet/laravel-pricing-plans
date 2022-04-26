@@ -2,18 +2,25 @@
 
 namespace Laravel\PricingPlans\Models;
 
+use App\Models\Feature;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Lang;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
+//use Illuminate\Support\Facades\Config;
+//use Illuminate\Support\Facades\Lang;
+use JetBrains\PhpStorm\Pure;
 use Laravel\PricingPlans\Models\Concerns\HasCode;
 use Laravel\PricingPlans\Models\Concerns\Resettable;
 use Laravel\PricingPlans\Period;
+use Sushi\Sushi;
 
 /**
  * Class Plan
  * @package Laravel\PricingPlans\Models
  * @property int $id
  * @property string $name
+ * @property string $code
+ * @property string $features
  * @property string $description
  * @property float $price
  * @property string $interval_unit
@@ -26,6 +33,7 @@ use Laravel\PricingPlans\Period;
 class Plan extends Model
 {
     use Resettable, HasCode;
+    use Sushi;
 
     /**
      * The attributes that are mass assignable.
@@ -54,6 +62,35 @@ class Plan extends Model
         'updated_at',
     ];
 
+    protected $appends = ['features'];
+
+    /**
+     * Get sushi rows.
+     *
+     * @return array
+     */
+    public function getRows(): array
+    {
+        $rows = [];
+        $plans = config('tariff-plans');
+
+        foreach ($plans as $_planBody) {
+            $rows[] = $_planBody['params'];
+        }
+
+        return $rows;
+    }
+
+    protected function sushiShouldCache(): bool
+    {
+        return true;
+    }
+
+    protected function sushiCacheReferencePath(): string
+    {
+        return config_path("tariff-plans.php");
+    }
+
     /**
      * Boot function for using with User Events.
      *
@@ -79,46 +116,76 @@ class Plan extends Model
      * Plan constructor.
      *
      * @param array $attributes
+     * @deprecated
      */
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-
-        $this->setTable(Config::get('plans.tables.plans'));
-    }
+//    public function __construct(array $attributes = [])
+//    {
+//        parent::__construct($attributes);
+//
+//        $this->setTable(Config::get('plans.tables.plans'));
+//    }
 
     /**
      * Get plan features.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
+     * @deprecated
      */
-    public function features()
+//    public function features(): BelongsToMany
+//    {
+//        return $this
+//            ->belongsToMany(
+//                Config::get('plans.models.Feature'),
+//                Config::get('plans.tables.plan_features'),
+//                'plan_id',
+//                'feature_id'
+//            )
+//            ->using(Config::get('plans.models.PlanFeature'))
+//            ->withPivot(['value', 'note'])
+//            ->orderBy('sort_order');
+//    }
+
+    /**
+     * Get features for the current plan.
+     *
+     * @return Collection
+     */
+    public function getFeaturesAttribute(): Collection
     {
-        return $this
-            ->belongsToMany(
-                Config::get('plans.models.Feature'),
-                Config::get('plans.tables.plan_features'),
-                'plan_id',
-                'feature_id'
-            )
-            ->using(Config::get('plans.models.PlanFeature'))
-            ->withPivot(['value', 'note'])
-            ->orderBy('sort_order');
+        $features = null;
+        $plans = config('tariff-plans');
+
+        foreach ($plans as $_planBody) {
+            if ($_planBody['params']['code'] === $this->code) {
+                foreach ($_planBody['features'] as $_featureCode => $_featureBody) {
+                    /** @var \Laravel\PricingPlans\Models\Feature $feature */
+                    $feature = Feature::code($_featureCode)->first();
+
+                    if ($feature) {
+                        $feature->value = $_featureBody['value'];
+                        $features[] = $feature;
+                    }
+                }
+            }
+        }
+
+        return collect($features);
     }
 
     /**
      * Get plan subscriptions.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @deprecated
      */
-    public function subscriptions()
-    {
-        return $this->hasMany(
-            Config::get('plans.models.PlanSubscription'),
-            'plan_id',
-            'id'
-        );
-    }
+//    public function subscriptions()
+//    {
+//        return $this->hasMany(
+//            Config::get('plans.models.PlanSubscription'),
+//            'plan_id',
+//            'id'
+//        );
+//    }
 
     /**
      * Check if plan is free.
