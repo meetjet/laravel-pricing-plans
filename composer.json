@@ -27,6 +27,7 @@
   },
   "require": {
     "php": "^8.0",
+    "calebporzio/sushi": "^2.4",
     "illuminate/database": "^8.0",
     "illuminate/support": "^8.0",
     "nesbot/carbon": "^2.43"

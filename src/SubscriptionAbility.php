@@ -114,17 +114,36 @@ class SubscriptionAbility
      * @param string$featureCode
      * @param  mixed $default
      * @return mixed
+     * @deprecated
+     */
+//    public function value(string $featureCode, $default = null)
+//    {
+//        if (!$this->subscription->plan->relationLoaded('features')) {
+//            $this->subscription->plan->features()->getEager();
+//        }
+//
+//        /** @var \Laravel\PricingPlans\Models\Feature $feature */
+//        foreach ($this->subscription->plan->features as $feature) {
+//            if ($featureCode === $feature->code) {
+//                return $feature->pivot->value;
+//            }
+//        }
+//
+//        return $default;
+//    }
+
+    /**
+     * @param string $featureCode
+     * @param null   $default
+     *
+     * @return mixed|string|null
      */
     public function value(string $featureCode, $default = null)
     {
-        if (!$this->subscription->plan->relationLoaded('features')) {
-            $this->subscription->plan->features()->getEager();
-        }
-
         /** @var \Laravel\PricingPlans\Models\Feature $feature */
         foreach ($this->subscription->plan->features as $feature) {
             if ($featureCode === $feature->code) {
-                return $feature->pivot->value;
+                return $feature->value;
             }
         }
 

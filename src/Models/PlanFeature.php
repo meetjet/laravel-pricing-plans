@@ -15,6 +15,7 @@ use Laravel\PricingPlans\Models\Concerns\BelongsToPlanModel;
  * @property string $note
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @deprecated
  */
 class PlanFeature extends Pivot
 {
