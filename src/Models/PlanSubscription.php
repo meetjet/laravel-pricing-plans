@@ -24,7 +24,7 @@ use LogicException;
  * @property int $id
  * @property string $subscriber_type
  * @property int $subscriber_id
- * @property int $plan_id
+ * @property string $plan_code
  * @property string $name
  * @property bool $canceled_immediately
  * @property \Carbon\Carbon $starts_at
@@ -57,7 +57,7 @@ class PlanSubscription extends Model
         'starts_at',
         'ends_at',
         'canceled_at',
-        'plan_id',
+        'plan_code',
     ];
 
     /**
@@ -104,7 +104,7 @@ class PlanSubscription extends Model
 
         static::saved(function ($model) {
             /** @var PlanSubscription $model */
-            if ($model->getOriginal('plan_id') && $model->getOriginal('plan_id') !== $model->plan_id) {
+            if ($model->getOriginal('plan_code') && $model->getOriginal('plan_code') !== $model->plan_code) {
                 Event::dispatch(new SubscriptionPlanChanged($model));
             }
         });
@@ -290,7 +290,7 @@ class PlanSubscription extends Model
             }
 
             // Attach new plan to subscription
-            $this->plan_id = $plan->id;
+            $this->plan_code = $plan->code;
             $this->save();
         });
 
