@@ -105,7 +105,7 @@ class SubscriptionBuilder
         }
 
         return $this->subscriber->subscriptions()->create(array_replace([
-            'plan_id' => $this->plan->id,
+            'plan_code' => $this->plan->code,
             'trial_ends_at' => $trialEndsAt,
             'name' => $this->name
         ], $attributes));
