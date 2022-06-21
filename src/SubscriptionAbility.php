@@ -2,6 +2,7 @@
 
 namespace Laravel\PricingPlans;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Laravel\PricingPlans\Models\PlanSubscription;
 
@@ -64,10 +65,15 @@ class SubscriptionAbility
      */
     public function consumed(string $featureCode): int
     {
+        /** Database query optimization. */
+        $usages = Cache::store('request')->remember("subscription_{$this->subscription->id}_usages", 2, function () {
+            return $this->subscription->usage;
+        });
+
         /** @var \Laravel\PricingPlans\Models\PlanSubscriptionUsage $usage */
-        foreach ($this->subscription->usage as $usage) {
+        foreach ($usages as $usage) {
             if ($usage->feature_code === $featureCode && !$usage->isExpired()) {
-                return (int) $usage->used;
+                return (int)$usage->used;
             }
         }
 
